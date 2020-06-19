@@ -1,0 +1,9 @@
+main
+*.txt
+build/
+!.gitignore
+!instance/
+!instance/new/*.txt
+!instance/old/*.txt
+update.sh
+rr
