@@ -2,7 +2,7 @@
 #include <iostream>
 #include <cmath>
 
-namespace pvrp {
+namespace pvrpdc {
 
 using std::pow;
 using std::cout;
@@ -13,48 +13,49 @@ using std::vector;
 /**
  * output to file/string/console
  */
-ostream &operator<<(ostream &strm, const Customer &c) {
-  strm << "Customer{idx: " << c.idx
-       << "\tlat: " << c.lat
-       << "\tlon: " << c.lon << endl
-       << "\tsrvTime: " << c.srvTime
-       << "\tdemand: " << c.demand << endl
-       << "\tsrvFreq: " << c.srvFreq
-       << "\tnumPatterns: " << c.numPatterns
-       << endl
-       << "\tavailable patterns: " << endl;
+ostream &operator<<(ostream &os, const Customer &c) {
+  os << "Customer{idx: " << c.idx
+     << "\tlat: " << c.lat
+     << "\tlon: " << c.lon << endl
+     << "\tsrvTime: " << c.srvTime
+     << "\tdemand: " << c.demand << endl
+     << "\tsrvFreq: " << c.srvFreq
+     << "\tnumPatterns: " << c.numPatterns
+     << endl
+     << "\tavailable patterns: " << endl;
+
   if (!c.patterns.empty()) {
     int numDays = (int)c.patterns.at(0).size();
-    strm << "\tday: ";
+    os << "\tday: ";
     for (int d = 0; d < numDays; ++d) {
-      strm << "\t" << d;
+      os << "\t" << d;
     }
-    strm << endl;
+    os << endl;
 
     for (auto &patt : c.patterns) {
-      strm << "\t";
+      os << "\t";
       for (const auto &v : patt) {
-        strm << "\t" << v;
+        os << "\t" << v;
       }
-      strm << endl;
+      os << endl;
     }
   }
 
-  strm << "\tdistance vector: " << endl;
+  os << "\tdistance vector: " << endl;
   int numCustomers = (int) c.distToOtherCus.size();
   for (int i = 0; i < numCustomers; ++i) {
-    strm << "\t" << i << "(" << c.distToOtherCus.at(i) << ")";
+    os << "\t" << i << "(" << c.distToOtherCus.at(i) << ")";
   }
-  strm << endl;
-  strm << "}";
-  return strm;
+  os << endl
+     << "}";
+  return os;
 }
 
 /**
  * constructor
  */
 Customer::Customer(int idx, double lat, double lon,
-                   double srvTime, int demand,
+                   int srvTime, int demand,
                    int srvFreq, int numPatterns,
                    int numDays) : idx(idx),
                                   lat(lat),
@@ -77,7 +78,7 @@ Customer::Customer(int idx, double lat, double lon,
  * destructor
  */
 Customer::~Customer() {
-
+  // nothing to do
 }
 
 /**

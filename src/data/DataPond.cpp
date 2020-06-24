@@ -6,7 +6,7 @@
 #include <regex>
 #include <cmath>
 
-namespace pvrp {
+namespace pvrpdc {
 
 using std::ostream;
 using std::cout;
@@ -162,8 +162,8 @@ void DataPond::calDistance() {
     for (int j = i; j < numNodes; ++j) {
       auto ci = customers.at(i);
       auto cj = customers.at(j);
-      double dist = calDistance(ci->getLat(), ci->getLon(),
-                                cj->getLat(), cj->getLon());
+      double dist = calDistance(ci->getLatitude(), ci->getLongitude(),
+                                cj->getLatitude(), cj->getLongitude());
       ci->setDist(j, dist);
       cj->setDist(i, dist);
     }

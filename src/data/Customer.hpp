@@ -3,7 +3,7 @@
 #include <vector>
 #include <iostream>
 
-namespace pvrp {
+namespace pvrpdc {
 
 /**
  * define a customer class.
@@ -23,27 +23,66 @@ class Customer {
 
  public:
   Customer(int idx, double lat, double lon,
-           double srvTime, int demand,
+           int srvTime, int demand,
            int srvFreq, int numPatterns,
            int numDays);
   ~Customer();
   Customer() = delete;
+  Customer(const Customer &) = delete;
+  Customer &operator=(const Customer &) = delete;
+  Customer(Customer &&) = delete;
+  Customer &operator=(Customer &&) = delete;
 
   // accessors
   int getIdx() const { return idx; }
-  double getLat() const { return lat; }
-  double getLon() const { return lon; }
-  double getSrvTime() const { return srvTime; }
+  double getLatitude() const { return lat; }
+  double getLongitude() const { return lon; }
+  int getSrvTime() const { return srvTime; }
   int getDemand() const { return demand; }
+  int getSrvFreq() const { return srvFreq; }
 
-  // distance
+  /**
+   * initialize distance vector
+   * 
+   * @param numCus   no. of customers in the instance, including the depot
+   */
   void initDistVec(int numCus);
+
+  /**
+   * set distance to another customer
+   * 
+   * @param cusIdx  index of the customer, starting from 0
+   * @param dist    value of the distance
+   */
   void setDist(int cusIdx, double dist) { distToOtherCus.at(cusIdx) = dist; }
+
+  /**
+   * obtain distance to another customer
+   * 
+   * @param cusIdx  index of the customer, starting from 0
+   */
   double getDist(int cusIdx) const { return distToOtherCus.at(cusIdx); }
 
-  // service pattern
+  /**
+   * add service pattern for this customer
+   * 
+   * @param pIdx      index of the pattern
+   * @param numDays   size of the pattern
+   * @param val       content of the pattern
+   */
   void addPattern(int pIdx, int numDays, size_t val);
+
+  /**
+   * get the total number of service patterns
+   */
   int getNumPatterns() const { return numPatterns; }
+
+  /**
+   * get the service pattern indicated by the input index
+   * 
+   * @param pIdx  index of the pattern
+   * @return a reference to the pattern
+   */
   std::vector<bool> &getPattern(int pIdx) { return patterns.at(pIdx); }
 
  private:
