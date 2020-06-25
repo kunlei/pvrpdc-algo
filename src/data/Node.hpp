@@ -6,32 +6,33 @@
 namespace pvrpdc {
 
 /**
- * define a customer class.
+ * define a node class
  * 
- * A customer object represents a location with demand to be fulfilled.
+ * A Node object represents a location with demand to be fulfilled.
  * It is also associated with a service time required to perform the
  * service. 
+ * 
+ * A node could be a depot, with index 0, or a customer, with index > 0.
  * 
  * A customer is also given a list of candidate service patterns that
  * indicates on which days it can be serviced.
  * 
- * Note that the customer with index 0 indicates the depot.
  */
-class Customer {
+class Node {
  public:
-  friend std::ostream &operator<<(std::ostream &, const Customer &c);
+  friend std::ostream &operator<<(std::ostream &, const Node &c);
 
  public:
-  Customer(int idx, double lat, double lon,
-           int srvTime, int demand,
-           int srvFreq, int numPatterns,
-           int numDays);
-  ~Customer();
-  Customer() = delete;
-  Customer(const Customer &) = delete;
-  Customer &operator=(const Customer &) = delete;
-  Customer(Customer &&) = delete;
-  Customer &operator=(Customer &&) = delete;
+  Node(int idx, double lat, double lon,
+       int srvTime, int demand,
+       int srvFreq, int numPatterns,
+       int numDays);
+  ~Node();
+  Node() = delete;
+  Node(const Node &) = delete;
+  Node &operator=(const Node &) = delete;
+  Node(Node &&) = delete;
+  Node &operator=(Node &&) = delete;
 
   // accessors
   int getIdx() const { return idx; }
@@ -54,14 +55,14 @@ class Customer {
    * @param cusIdx  index of the customer, starting from 0
    * @param dist    value of the distance
    */
-  void setDist(int cusIdx, double dist) { distToOtherCus.at(cusIdx) = dist; }
+  void setDist(int cusIdx, double dist) { distToOtherNodes.at(cusIdx) = dist; }
 
   /**
    * obtain distance to another customer
    * 
    * @param cusIdx  index of the customer, starting from 0
    */
-  double getDist(int cusIdx) const { return distToOtherCus.at(cusIdx); }
+  double getDist(int cusIdx) const { return distToOtherNodes.at(cusIdx); }
 
   /**
    * add service pattern for this customer
@@ -101,7 +102,7 @@ class Customer {
   /**
    * distance to other customers
    */
-  std::vector<double> distToOtherCus;
+  std::vector<double> distToOtherNodes;
   /**
    * service time
    */
@@ -123,7 +124,7 @@ class Customer {
    */
   std::vector<std::vector<bool>> patterns;
 };
-std::ostream &operator<<(std::ostream &, const Customer &c);
+std::ostream &operator<<(std::ostream &, const Node &c);
 
 }
 

@@ -25,6 +25,7 @@ TARGET   := main
 INCLUDE  := -I. -I$(CPLEXINCDIR) -I$(CONCERTINCDIR) -I$(BOOSTINCDIR)
 SRC      :=                      \
 	$(wildcard src/data/*.cpp) \
+	$(wildcard src/common/*.cpp) \
 	$(wildcard *.cpp) \
 
 OBJECTS := $(SRC:%.cpp=$(OBJ_DIR)/%.o)

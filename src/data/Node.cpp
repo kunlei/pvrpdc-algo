@@ -1,27 +1,26 @@
-#include "Customer.hpp"
-#include <iostream>
+#include "Node.hpp"
 #include <cmath>
+#include <iostream>
 
 namespace pvrpdc {
 
 using std::pow;
 using std::cout;
 using std::endl;
-using std::ostream;
 using std::vector;
+using std::ostream;
 
 /**
  * output to file/string/console
  */
-ostream &operator<<(ostream &os, const Customer &c) {
-  os << "Customer{idx: " << c.idx
+ostream &operator<<(ostream &os, const Node &c) {
+  os << "Node{idx: " << c.idx
      << "\tlat: " << c.lat
      << "\tlon: " << c.lon << endl
      << "\tsrvTime: " << c.srvTime
      << "\tdemand: " << c.demand << endl
      << "\tsrvFreq: " << c.srvFreq
-     << "\tnumPatterns: " << c.numPatterns
-     << endl
+     << "\tnumPatterns: " << c.numPatterns << endl
      << "\tavailable patterns: " << endl;
 
   if (!c.patterns.empty()) {
@@ -42,9 +41,9 @@ ostream &operator<<(ostream &os, const Customer &c) {
   }
 
   os << "\tdistance vector: " << endl;
-  int numCustomers = (int) c.distToOtherCus.size();
-  for (int i = 0; i < numCustomers; ++i) {
-    os << "\t" << i << "(" << c.distToOtherCus.at(i) << ")";
+  int numNodes = (int) c.distToOtherNodes.size();
+  for (int i = 0; i < numNodes; ++i) {
+    os << "\t" << i << "(" << c.distToOtherNodes.at(i) << ")";
   }
   os << endl
      << "}";
@@ -54,16 +53,16 @@ ostream &operator<<(ostream &os, const Customer &c) {
 /**
  * constructor
  */
-Customer::Customer(int idx, double lat, double lon,
-                   int srvTime, int demand,
-                   int srvFreq, int numPatterns,
-                   int numDays) : idx(idx),
-                                  lat(lat),
-                                  lon(lon),
-                                  srvTime(srvTime),
-                                  demand(demand),
-                                  srvFreq(srvFreq),
-                                  numPatterns(numPatterns) {
+Node::Node(int idx, double lat, double lon,
+           int srvTime, int demand,
+           int srvFreq, int numPatterns,
+           int numDays) : idx(idx),
+                          lat(lat),
+                          lon(lon),
+                          srvTime(srvTime),
+                          demand(demand),
+                          srvFreq(srvFreq),
+                          numPatterns(numPatterns) {
   // initialize the vector of service patterns, with each pattern itself
   // a vector of size 'numDays' and a 'true' value indicate a day that
   // service is needed, false otherwise
@@ -77,24 +76,24 @@ Customer::Customer(int idx, double lat, double lon,
 /**
  * destructor
  */
-Customer::~Customer() {
+Node::~Node() {
   // nothing to do
 }
 
 /**
  * initialize empty distance vector
  */
-void Customer::initDistVec(int numCus) {
-  distToOtherCus.reserve(numCus);
+void Node::initDistVec(int numCus) {
+  distToOtherNodes.reserve(numCus);
   for (int i = 0; i < numCus; ++i) {
-    distToOtherCus.push_back(0);
+    distToOtherNodes.push_back(0);
   }
 }
 
 /**
  * add a candidate service pattern
  */
-void Customer::addPattern(int pIdx, int numDays, size_t val) {
+void Node::addPattern(int pIdx, int numDays, size_t val) {
   // get binary string
   size_t binaryVal = numToBinary(val);
 
@@ -113,7 +112,7 @@ void Customer::addPattern(int pIdx, int numDays, size_t val) {
  * transform a integer value into a string of binary numbers
  * for example, '3' will be translated into '11'.
  */
-size_t Customer::numToBinary(size_t num) {
+size_t Node::numToBinary(size_t num) {
   if (num == 0) {
     return 0;
   } else {

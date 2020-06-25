@@ -6,7 +6,7 @@ using std::cout;
 using std::endl;
 using std::string;
 
-using namespace pvrp;
+using namespace pvrpdc;
 
 int main() {
   string instMark{"new"};

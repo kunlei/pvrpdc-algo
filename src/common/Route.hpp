@@ -1,11 +1,11 @@
 #ifndef ROUTE_HPP
 #define ROUTE_HPP
-#include <list>
 #include <map>
+#include <list>
 #include <iostream>
-#include "Node.hpp"
+#include "Stop.hpp"
 
-namespace pvrp {
+namespace pvrpdc {
 
 class Route {
  public:
@@ -19,8 +19,8 @@ class Route {
   /**
    * linked list of visited nodes
    */
-  Node *head;
-  Node *tail;
+  Stop *head;
+  Stop *tail;
   /**
    * no. of visited customers on route
    */

@@ -3,7 +3,8 @@
 #include <vector>
 #include <string>
 #include <iostream>
-#include "Customer.hpp"
+#include "Node.hpp"
+#include "Vehicle.hpp"
 
 namespace pvrpdc {
 
@@ -17,6 +18,7 @@ class DataPond {
 
   // data processing
   void readData(std::string instMark, int instId);
+  void readData(std::string filename);
   void calDistance();
   void calSrvPattern();
 
@@ -25,8 +27,6 @@ class DataPond {
   int getNumNodes() const { return numNodes; }
   int getNumCustomers() const { return numCustomers; }
   int getNumDays() const { return numDays; }
-  double getMaxDuration() const { return maxDuration; }
-  int getMaxLoad() const { return maxLoad; }
   void showCustomers() const;
 
  private:
@@ -36,27 +36,20 @@ class DataPond {
 
  private:
   /**
-   * number of vehicles
-   */
-  int numVehicles;
-  /**
-   * number of customers
-   */
-  int numNodes;
-  int numCustomers;
-  /**
    * number of days in the planning horizon
    */
   int numDays;
   /**
-   * constraints on the vehicle
+   * vehicles
    */
-  double maxDuration;
-  int maxLoad;
+  int numVehicles;
+  std::vector<Vehicle *> vehicles;
   /**
-   * all the customers
+   * nodes, depot and customers
    */
-  std::vector<Customer *> customers;
+  int numNodes;
+  int numCustomers;
+  std::vector<Node *> nodes;
 };
 std::ostream &operator<<(std::ostream &, const DataPond &);
 

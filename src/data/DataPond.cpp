@@ -8,19 +8,19 @@
 
 namespace pvrpdc {
 
-using std::ostream;
+using std::ios;
+using std::pow;
 using std::cout;
 using std::endl;
-using std::string;
-using std::to_string;
-using std::ios;
-using std::ifstream;
-using std::stringstream;
-using std::vector;
 using std::stoi;
 using std::stod;
 using std::sqrt;
-using std::pow;
+using std::vector;
+using std::string;
+using std::ostream;
+using std::ifstream;
+using std::to_string;
+using std::stringstream;
 
 /**
  * output to console/file/string
@@ -29,8 +29,6 @@ ostream &operator<<(ostream &strm, const DataPond &dp) {
   strm << "DataPond{numVehicles: " << dp.numVehicles
        << "\tnumCustomers: " << dp.numNodes
        << "\tnumDays: " << dp.numDays
-       << "\tmaxDuration: " << dp.maxDuration
-       << "\tmaxLoad: " << dp.maxLoad
        << "}";
   return strm;
 }
@@ -38,23 +36,27 @@ ostream &operator<<(ostream &strm, const DataPond &dp) {
 /**
  * constructor
  */
-DataPond::DataPond() : numVehicles(0),
+DataPond::DataPond() : numDays(0),
+                       numVehicles(0),
                        numNodes(0),
-                       numCustomers(0),
-                       numDays(0),
-                       maxDuration(0),
-                       maxLoad(0) {
+                       numCustomers(0) {
 }
 
 /**
  * destructor
  */
 DataPond::~DataPond() {
+  // remove all vehicles
+  for (auto &v : vehicles) {
+    delete v;
+  }
+  vehicles.clear();
+
   // remove all customers
-  for (auto &c : customers) {
+  for (auto &c : nodes) {
     delete c;
   }
-  customers.clear();
+  nodes.clear();
 }
 
 /**
@@ -86,8 +88,21 @@ void DataPond::readData(string instMark, int instId) {
   }
   cout << "\tfilename: " << filename << "\n";
 
+  
+}
+
+/**
+ * read instance data
+ */
+void DataPond::readData(string filename) {
+  cout << "DataPond::readData()...start..." << endl;
   // create input file stream
   ifstream infile(filename, ios::in);
+  if (!infile.is_open()) {
+    cout << "\tinstance file cannot open!" << endl;
+    cout << "DataPond::readData()...complete, error!!!" << endl;
+    return;
+  }
   
   string line, word;
   vector<string> row;
@@ -99,13 +114,14 @@ void DataPond::readData(string instMark, int instId) {
     row.push_back(word);
   }
   numVehicles = stoi(row.at(1)); 
-  numNodes = stoi(row.at(2));
-  numCustomers = numNodes - 1;
+  numCustomers = stoi(row.at(2));
+  numNodes = numCustomers + 1;
   numDays = stoi(row.at(3));
   cout << "\tfirst line read...\n";
 
   // read constraints on vehicle
-  for (int i = 0; i < numDays; ++i) {
+  int maxDuration{0}, maxLoad{0};
+  for (int i = 0; i < numVehicles; ++i) {
     getline(infile, line);
     stringstream s(line);
     row.clear();
@@ -114,6 +130,9 @@ void DataPond::readData(string instMark, int instId) {
     }
     maxDuration = stoi(row.at(0));
     maxLoad = stoi(row.at(1));
+    
+    Vehicle *pv = new Vehicle(i, maxLoad, maxDuration);
+    vehicles.push_back(pv);
   }
   cout << "\tvehicle info read...\n";
 
@@ -131,7 +150,7 @@ void DataPond::readData(string instMark, int instId) {
     infile >> srvTime >> demand;
     infile >> srvFreq >> numPatterns;
 
-    Customer *pCus = new Customer(idx, lat, lon,
+    Node *pCus = new Node(idx, lat, lon,
                                   srvTime, demand,
                                   srvFreq, numPatterns, 
                                   numDays);
@@ -142,10 +161,10 @@ void DataPond::readData(string instMark, int instId) {
         pCus->addPattern(p, numDays, pattVal);
       }
     }
-    customers.push_back(pCus);
+    nodes.push_back(pCus);
   }
   infile.close();
-  cout << "DataPond::start reading instance file...\n";
+  cout << "DataPond::readData()...complete!" << endl;
 }
 
 /**
@@ -153,15 +172,15 @@ void DataPond::readData(string instMark, int instId) {
  */
 void DataPond::calDistance() {
   // initialize distance vector
-  for (auto &c : customers) {
+  for (auto &c : nodes) {
     c->initDistVec(numNodes);
   }
 
   // calculate distance
   for (int i = 0; i < numNodes; ++i) {
     for (int j = i; j < numNodes; ++j) {
-      auto ci = customers.at(i);
-      auto cj = customers.at(j);
+      auto ci = nodes.at(i);
+      auto cj = nodes.at(j);
       double dist = calDistance(ci->getLatitude(), ci->getLongitude(),
                                 cj->getLatitude(), cj->getLongitude());
       ci->setDist(j, dist);
@@ -175,7 +194,7 @@ void DataPond::calDistance() {
  */
 void DataPond::showCustomers() const {
   cout << "show all customers..\n";
-  for (auto pc : customers) {
+  for (auto pc : nodes) {
     cout << *pc << endl;
   }
 }
