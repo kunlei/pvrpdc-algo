@@ -61,7 +61,7 @@ DataPond::~DataPond() {
 
 /**
  * read instance data from file
- * @param instMark type of the instance, "new" or "old"
+ * @param instMark type of the instance, "new", "old" or "con"
  * @param instId integer id of the instance
  */
 void DataPond::readData(string instMark, int instId) {
@@ -119,7 +119,7 @@ void DataPond::readData(string filename) {
   numDays = stoi(row.at(3));
   cout << "\tfirst line read...\n";
 
-  // read constraints on vehicle
+  // read vehicles
   int maxDuration{0}, maxLoad{0};
   for (int i = 0; i < numVehicles; ++i) {
     getline(infile, line);
@@ -150,18 +150,18 @@ void DataPond::readData(string filename) {
     infile >> srvTime >> demand;
     infile >> srvFreq >> numPatterns;
 
-    Node *pCus = new Node(idx, lat, lon,
-                                  srvTime, demand,
-                                  srvFreq, numPatterns, 
-                                  numDays);
+    Node *pn = new Node(idx, lat, lon,
+                          srvTime, demand,
+                          srvFreq, numPatterns, 
+                          numDays);
 
     if (numPatterns > 0) {
       for (int p = 0; p < numPatterns; ++p) {
         infile >> pattVal;
-        pCus->addPattern(p, numDays, pattVal);
+        pn->addPattern(p, numDays, pattVal);
       }
     }
-    nodes.push_back(pCus);
+    nodes.push_back(pn);
   }
   infile.close();
   cout << "DataPond::readData()...complete!" << endl;
