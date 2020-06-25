@@ -17,7 +17,12 @@ class DataPond {
   ~DataPond();
 
   // data processing
-  void readData(std::string instMark, int instId);
+  std::string getInstFilename(std::string instMark,
+                              int instId,
+                              int numNodes,
+                              int numDays,
+                              int numVeh,
+                              std::string flag);
   void readData(std::string filename);
   void calDistance();
   void calSrvPattern();

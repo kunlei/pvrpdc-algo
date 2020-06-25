@@ -9,14 +9,19 @@ using std::string;
 using namespace pvrpdc;
 
 int main() {
-  string instMark{"new"};
+  string instMark{"con"};
   int instId{1};
+  int numNodes{11};
+  int numDays{5};
+  int numVeh{2};
+  string flag{"a"};
 
   // read data
   DataPond dataPond;
-  dataPond.readData(instMark, instId);
+  string filename = dataPond.getInstFilename(instMark, instId, numNodes, numDays, numVeh, flag);
+  dataPond.readData(filename);
   dataPond.calDistance();
-  dataPond.showCustomers();
+  // dataPond.showCustomers();
 
   cout << dataPond << endl;
 

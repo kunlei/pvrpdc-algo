@@ -16,23 +16,23 @@ using std::ostream;
 ostream &operator<<(ostream &os, const Node &c) {
   os << "Node{idx: " << c.idx
      << "\tlat: " << c.lat
-     << "\tlon: " << c.lon << endl
+     << "\tlon: " << c.lon
      << "\tsrvTime: " << c.srvTime
-     << "\tdemand: " << c.demand << endl
+     << "\tdemand: " << c.demand
      << "\tsrvFreq: " << c.srvFreq
-     << "\tnumPatterns: " << c.numPatterns << endl
-     << "\tavailable patterns: " << endl;
+     << "\tnumPatterns: " << c.numPatterns << "}" << endl
+     << "\t\tavailable patterns: " << endl;
 
   if (!c.patterns.empty()) {
     int numDays = (int)c.patterns.at(0).size();
-    os << "\tday: ";
+    os << "\t\tday: ";
     for (int d = 0; d < numDays; ++d) {
       os << "\t" << d;
     }
     os << endl;
 
     for (auto &patt : c.patterns) {
-      os << "\t";
+      os << "\t\t";
       for (const auto &v : patt) {
         os << "\t" << v;
       }
@@ -40,13 +40,12 @@ ostream &operator<<(ostream &os, const Node &c) {
     }
   }
 
-  os << "\tdistance vector: " << endl;
+  os << "\t\tdistance vector: " << endl << "\t";
   int numNodes = (int) c.distToOtherNodes.size();
   for (int i = 0; i < numNodes; ++i) {
     os << "\t" << i << "(" << c.distToOtherNodes.at(i) << ")";
   }
-  os << endl
-     << "}";
+  os << endl;
   return os;
 }
 

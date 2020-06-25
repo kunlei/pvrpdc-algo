@@ -14,6 +14,7 @@ ostream &operator<<(ostream &os, const Vehicle &v) {
      << "idx: " << v.idx
      << "\tmaxLoad: " << v.maxLoad
      << "\tmaxDuration: " << v.maxDuration
+     << "\tmaxStops: " << v.maxStops
      << "}";
   return os;
 }
@@ -23,9 +24,11 @@ ostream &operator<<(ostream &os, const Vehicle &v) {
  */
 Vehicle::Vehicle(int idx,
                  int maxLoad,
-                 int maxDuration) : idx(idx),
-                                    maxLoad(maxLoad),
-                                    maxDuration(maxDuration) {
+                 int maxDuration,
+                 int maxStops) : idx(idx),
+                                 maxLoad(maxLoad),
+                                 maxDuration(maxDuration),
+                                 maxStops(maxStops) {
 }
 
 /**

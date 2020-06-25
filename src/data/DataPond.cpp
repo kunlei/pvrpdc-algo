@@ -1,15 +1,16 @@
 #include "DataPond.hpp"
-#include <fstream>
-#include <sstream>
-#include <string>
-#include <vector>
 #include <regex>
 #include <cmath>
+#include <string>
+#include <vector>
+#include <fstream>
+#include <sstream>
 
 namespace pvrpdc {
 
 using std::ios;
 using std::pow;
+using std::ceil;
 using std::cout;
 using std::endl;
 using std::stoi;
@@ -25,12 +26,25 @@ using std::stringstream;
 /**
  * output to console/file/string
  */
-ostream &operator<<(ostream &strm, const DataPond &dp) {
-  strm << "DataPond{numVehicles: " << dp.numVehicles
-       << "\tnumCustomers: " << dp.numNodes
-       << "\tnumDays: " << dp.numDays
-       << "}";
-  return strm;
+ostream &operator<<(ostream &os, const DataPond &dp) {
+  os << "DataPond{numVehicles: " << dp.numVehicles
+     << "\tnumNodes: " << dp.numNodes
+     << "\tnumDays: " << dp.numDays << endl;
+
+  // show vehicles
+  os << "\tshow available vehicles: " << endl;
+  for (int v = 0; v < dp.numVehicles; ++v) {
+    os << "\t" << *(dp.vehicles.at(v)) << endl;
+  }
+
+  // show nodes
+  os << "\tshow nodes: " << endl;
+  for (int n = 0; n < dp.numNodes; ++n) {
+    os << "\t" << *(dp.nodes.at(n)) << endl;
+  }
+  
+  os << "}" << endl;
+  return os;
 }
 
 /**
@@ -64,8 +78,8 @@ DataPond::~DataPond() {
  * @param instMark type of the instance, "new", "old" or "con"
  * @param instId integer id of the instance
  */
-void DataPond::readData(string instMark, int instId) {
-  cout << "DataPond::start reading instance file...\n";
+string DataPond::getInstFilename(string instMark, int instId,
+                                 int numNodes, int numDays, int numVeh, string flag) {
   // derive filename
   string filename = "instance/";
   if (instMark == "new") {
@@ -82,13 +96,19 @@ void DataPond::readData(string instMark, int instId) {
     } else {
       filename += to_string(instId) + ".txt";
     }
+  } else if (instMark == "con") {
+    // example filename: test21-p3-m4-b.dat
+    filename += "con/test" + 
+                to_string(numNodes) + 
+                "-p" + to_string(numDays) +
+                "-m" + to_string(numVeh) +
+                "-" + flag + ".dat";
   } else {
     cout << "DataPond::error in reading instance file, exit...\n";
-    return;
+    return "";
   }
-  cout << "\tfilename: " << filename << "\n";
-
-  
+  cout << "instance filename: " << filename << endl;
+  return filename;
 }
 
 /**
@@ -99,39 +119,28 @@ void DataPond::readData(string filename) {
   // create input file stream
   ifstream infile(filename, ios::in);
   if (!infile.is_open()) {
-    cout << "\tinstance file cannot open!" << endl;
-    cout << "DataPond::readData()...complete, error!!!" << endl;
+    cout << "\tinstance file cannot open!" << endl
+         << "DataPond::readData()...complete, error!!!" << endl;
+    infile.close();
     return;
   }
-  
-  string line, word;
-  vector<string> row;
+
+  int num;
 
   // read first line
-  getline(infile, line);
-  stringstream s(line);
-  while (getline(s, word, ' ')) {
-    row.push_back(word);
-  }
-  numVehicles = stoi(row.at(1)); 
-  numCustomers = stoi(row.at(2));
+  infile >> num >> numVehicles >> numCustomers >> numDays;
   numNodes = numCustomers + 1;
-  numDays = stoi(row.at(3));
   cout << "\tfirst line read...\n";
 
   // read vehicles
   int maxDuration{0}, maxLoad{0};
-  for (int i = 0; i < numVehicles; ++i) {
-    getline(infile, line);
-    stringstream s(line);
-    row.clear();
-    while (getline(s, word, ' ')) {
-      row.push_back(word);
-    }
-    maxDuration = stoi(row.at(0));
-    maxLoad = stoi(row.at(1));
-    
-    Vehicle *pv = new Vehicle(i, maxLoad, maxDuration);
+  for (int i = 0; i < numDays; ++i) {
+    infile >> maxDuration >> maxLoad;
+  }
+
+  int maxStops = static_cast<int>(ceil(0.75 * numCustomers / numVehicles));
+  for (int v = 0; v < numVehicles; ++v) {
+    Vehicle *pv = new Vehicle(v, maxLoad, maxDuration, maxStops);
     vehicles.push_back(pv);
   }
   cout << "\tvehicle info read...\n";
@@ -142,7 +151,6 @@ void DataPond::readData(string filename) {
   int srvTime, demand;
   int srvFreq, numPatterns;
   size_t pattVal;
-  int colIdx{0};
   string strCol;
   for (int i = 0; i < numNodes; ++i) {
     infile >> idx;
@@ -151,9 +159,9 @@ void DataPond::readData(string filename) {
     infile >> srvFreq >> numPatterns;
 
     Node *pn = new Node(idx, lat, lon,
-                          srvTime, demand,
-                          srvFreq, numPatterns, 
-                          numDays);
+                        srvTime, demand,
+                        srvFreq, numPatterns, 
+                        numDays);
 
     if (numPatterns > 0) {
       for (int p = 0; p < numPatterns; ++p) {

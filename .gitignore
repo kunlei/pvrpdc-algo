@@ -2,7 +2,7 @@ main
 *.txt
 build/
 !.gitignore
-!instance/
+!instance/con/*.txt
 !instance/new/*.txt
 !instance/old/*.txt
 update.sh
