@@ -33,6 +33,7 @@ class DataPond {
   int getNumCustomers() const { return numCustomers; }
   int getNumDays() const { return numDays; }
   void showCustomers() const;
+  const Node *getNode(int i) const { return nodes.at(i); }
 
  private:
   double calDistance(double lat1, double lon1, 

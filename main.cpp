@@ -1,6 +1,10 @@
 #include <iostream>
 #include <string>
 #include "src/data/DataPond.hpp"
+#include "src/lns/LnsAlgo.hpp"
+#include <ctime>
+#include <cstdlib> // random number
+#include <cstdio>
 
 using std::cout;
 using std::endl;
@@ -9,6 +13,8 @@ using std::string;
 using namespace pvrpdc;
 
 int main() {
+  // srand((unsigned) time(0));
+
   string instMark{"con"};
   int instId{1};
   int numNodes{11};
@@ -24,6 +30,12 @@ int main() {
   // dataPond.showCustomers();
 
   cout << dataPond << endl;
+
+  // start large neighborhood search
+  LnsAlgo lnsAlgo(dataPond);
+  lnsAlgo.initialize();
+  lnsAlgo.run();
+  lnsAlgo.output();
 
   return 0;
 }
